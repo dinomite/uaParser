@@ -30,9 +30,6 @@ logging.info('Loading %s, app version = %s',
 
 # Declare the Django version we need.
 from google.appengine.dist import use_library
-### TODO I added this
-sys.path.insert(0, "/opt/local/lib/python2.6/site-packages/")
-### TODO
 use_library('django', '1.1')
 
 # Fail early if we can't import Django 1.x.  Log identifying information.
