@@ -26,7 +26,7 @@ from google.appengine.ext.webapp import util
 
 # Log a message each time this module get loaded.
 logging.info('Loading %s, app version = %s',
-             __name__, os.getenv('CURRENT_VERSION_ID'))
+               __name__, os.getenv('CURRENT_VERSION_ID'))
 
 # Declare the Django version we need.
 from google.appengine.dist import use_library
@@ -35,7 +35,7 @@ use_library('django', '1.1')
 # Fail early if we can't import Django 1.x.  Log identifying information.
 import django
 logging.info('django.__file__ = %r, django.VERSION = %r',
-             django.__file__, django.VERSION)
+               django.__file__, django.VERSION)
 assert django.VERSION[0] >= 1, "This Django version is too old"
 
 
@@ -51,9 +51,9 @@ import django.db
 import django.dispatch.dispatcher
 
 def log_exception(*args, **kwds):
-  """Django signal handler to log an exception."""
-  cls, err = sys.exc_info()[:2]
-  logging.exception('Exception in request: %s: %s', cls.__name__, err)
+    """Django signal handler to log an exception."""
+    cls, err = sys.exc_info()[:2]
+    logging.exception('Exception in request: %s: %s', cls.__name__, err)
 
 
 # Log all exceptions detected by Django.
@@ -61,15 +61,20 @@ django.core.signals.got_request_exception.connect(log_exception)
 
 # Unregister Django's default rollback event handler.
 django.core.signals.got_request_exception.disconnect(
-    django.db._rollback_on_exception)
+      django.db._rollback_on_exception)
 
 
 def main():
-  # Create a Django application for WSGI.
-  application = django.core.handlers.wsgi.WSGIHandler()
+    # Create a Django application for WSGI.
+    application = django.core.handlers.wsgi.WSGIHandler()
 
-  # Run the WSGI CGI handler with that application.
-  util.run_wsgi_app(application)
+    # Run the WSGI CGI handler with that application.
+    #util.run_wsgi_app(application)
+
+    import user_agent
+    userAgentString = 'Mozilla/5.0 (Macintosh; U; Intel Mac OS X 10_6_4; en-US) AppleWebKit/534.3 (KHTML, like Gecko) Chrome/6.0.472.63 Safari/534.3'
+    browser = user_agent.UserAgent.factory(userAgentString).pretty()
+    print browser
 
 if __name__ == '__main__':
-  main()
+    main()

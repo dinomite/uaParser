@@ -21,7 +21,7 @@ import logging
 import sys
 
 from google.appengine.ext import db
-from models import user_agent_parser
+import user_agent_parser
 
 # Mainly used for SeedDatastore.
 # You may want models.result_stats.py
