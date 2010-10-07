@@ -1,0 +1,8 @@
+uaParser
+
+Drew Stephens <drew@dinomite.net>
+2010-10-06
+
+Extricating the user agent parsing code from browserscope.
+
+See http://www.browserscope.org and the code at http://code.google.com/p/browserscope
