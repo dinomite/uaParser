@@ -30,6 +30,9 @@ logging.info('Loading %s, app version = %s',
 
 # Declare the Django version we need.
 from google.appengine.dist import use_library
+### TODO I added this
+sys.path.insert(0, "/opt/local/lib/python2.6/site-packages/")
+### TODO
 use_library('django', '1.1')
 
 # Fail early if we can't import Django 1.x.  Log identifying information.
@@ -49,10 +52,6 @@ import django.core.handlers.wsgi
 import django.core.signals
 import django.db
 import django.dispatch.dispatcher
-
-# Moving this to main.py to try to prevent weird exceptions in prod.
-from django.template import add_to_builtins
-add_to_builtins('base.custom_filters')
 
 def log_exception(*args, **kwds):
   """Django signal handler to log an exception."""
