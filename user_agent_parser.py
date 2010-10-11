@@ -17,8 +17,6 @@
 """Shared models."""
 
 import re
-import logging
-import sys
 
 class UserAgentParser(object):
     def __init__(self, pattern, family_replacement=None, v1_replacement=None):
@@ -63,6 +61,54 @@ class UserAgentParser(object):
                 if match.lastindex >= 4:
                     v3 = match.group(4)
         return family, v1, v2, v3
+
+def Parse(user_agent_string, js_user_agent_string=None,
+                    js_user_agent_family=None,
+                    js_user_agent_v1=None,
+                    js_user_agent_v2=None,
+                    js_user_agent_v3=None):
+    """Parses the user-agent string and returns the bits.
+
+    Args:
+        user_agent_string: The full user-agent string.
+        js_user_agent_string: JavaScript ua string from client-side
+        js_user_agent_family: This is an override for the family name to deal
+                with the fact that IE platform preview (for instance) cannot be
+                distinguished by user_agent_string, but only in javascript.
+        js_user_agent_v1: v1 override - see above.
+        js_user_agent_v2: v1 override - see above.
+        js_user_agent_v3: v1 override - see above.
+    Returns:
+        [family, v1, v2, v3]
+        e.g. ['Chrome', '4', '0', '203']
+    """
+
+
+    # Override via JS properties.
+    if js_user_agent_family is not None and js_user_agent_family != '':
+        family = js_user_agent_family
+        v1 = None
+        v2 = None
+        v3 = None
+        if js_user_agent_v1 is not None:
+            v1 = js_user_agent_v1
+        if js_user_agent_v2 is not None:
+            v2 = js_user_agent_v2
+        if js_user_agent_v3 is not None:
+            v3 = js_user_agent_v3
+    else:
+        for parser in USER_AGENT_PARSERS:
+            family, v1, v2, v3 = parser.Parse(user_agent_string)
+            if family:
+                break
+
+    # Override for Chrome Frame IFF Chrome is enabled.
+    if (js_user_agent_string and js_user_agent_string.find('Chrome/') > -1 and
+            user_agent_string.find('chromeframe') > -1):
+        family = 'Chrome Frame (%s %s)' % (family, v1)
+        cf_family, v1, v2, v3 = Parse(js_user_agent_string)
+
+    return family or 'Other', v1, v2, v3
 
 
 
@@ -172,51 +218,3 @@ USER_AGENT_PARSERS = (
     _P(r'(MSIE) (\d+)\.(\d+)', family_replacement='IE'),
 )
 # select family, v1, v2, v3 from user_agent where v3 regexp '[a-zA-Z]' group by family, v1, v2, v3;
-
-def Parse(user_agent_string, js_user_agent_string=None,
-                    js_user_agent_family=None,
-                    js_user_agent_v1=None,
-                    js_user_agent_v2=None,
-                    js_user_agent_v3=None):
-    """Parses the user-agent string and returns the bits.
-
-    Args:
-        user_agent_string: The full user-agent string.
-        js_user_agent_string: JavaScript ua string from client-side
-        js_user_agent_family: This is an override for the family name to deal
-                with the fact that IE platform preview (for instance) cannot be
-                distinguished by user_agent_string, but only in javascript.
-        js_user_agent_v1: v1 override - see above.
-        js_user_agent_v2: v1 override - see above.
-        js_user_agent_v3: v1 override - see above.
-    Returns:
-        [family, v1, v2, v3]
-        e.g. ['Chrome', '4', '0', '203']
-    """
-
-
-    # Override via JS properties.
-    if js_user_agent_family is not None and js_user_agent_family != '':
-        family = js_user_agent_family
-        v1 = None
-        v2 = None
-        v3 = None
-        if js_user_agent_v1 is not None:
-            v1 = js_user_agent_v1
-        if js_user_agent_v2 is not None:
-            v2 = js_user_agent_v2
-        if js_user_agent_v3 is not None:
-            v3 = js_user_agent_v3
-    else:
-        for parser in USER_AGENT_PARSERS:
-            family, v1, v2, v3 = parser.Parse(user_agent_string)
-            if family:
-                break
-
-    # Override for Chrome Frame IFF Chrome is enabled.
-    if (js_user_agent_string and js_user_agent_string.find('Chrome/') > -1 and
-            user_agent_string.find('chromeframe') > -1):
-        family = 'Chrome Frame (%s %s)' % (family, v1)
-        cf_family, v1, v2, v3 = Parse(js_user_agent_string)
-
-    return family or 'Other', v1, v2, v3
