@@ -1,5 +1,3 @@
-#!/usr/bin/python2.5
-#
 # Copyright 2009 Google Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the 'License')
@@ -17,8 +15,6 @@
 """User Agent model."""
 
 import re
-import logging
-import sys
 
 import user_agent_parser
 
