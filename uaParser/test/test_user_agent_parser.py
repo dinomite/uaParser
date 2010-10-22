@@ -20,8 +20,7 @@ __author__ = 'slamm@google.com (Stephen Lamm)'
 
 import unittest
 
-from models import user_agent_parser
-
+from uaParser.lib import user_agent_parser
 
 CHROME_UA_STRING = (
     'Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US) AppleWebKit/530.1 '
@@ -54,28 +53,28 @@ TEST_STRINGS = (
      '3.0.04506.648; .NET CLR 3.5.21022; .NET CLR 3.0.4506.2152; .NET CLR '
      '3.5.30729),gzip(gfe),gzip(gfe)',
      {'js_user_agent_string': 'Mozilla/4.0 (compatible; MSIE 8.0; '
-      'Windows NT 5.1; Trident/4.0; chromeframe; .NET CLR 2.0.50727; '
-      '.NET CLR 1.1.4322; .NET CLR 3.0.04506.648; .NET CLR 3.5.21022; '
-      '.NET CLR 3.0.4506.2152; .NET CLR 3.5.30729)'}),
+        'Windows NT 5.1; Trident/4.0; chromeframe; .NET CLR 2.0.50727; '
+        '.NET CLR 1.1.4322; .NET CLR 3.0.04506.648; .NET CLR 3.5.21022; '
+        '.NET CLR 3.0.4506.2152; .NET CLR 3.5.30729)'}),
     (('IE Platform Preview', '9', '0', '1'),
      'Mozilla/4.0 (compatible; MSIE 8.0; Windows NT 5.1; Trident/4.0; GTB6; '
      '.NET CLR 2.0.50727; .NET CLR 1.1.4322),gzip(gfe),gzip(gfe)',
      {'js_user_agent_string': 'Mozilla/4.0 (compatible; MSIE 8.0; '
-      'Windows NT 5.1; Trident/4.0; .NET CLR 2.0.50727; .NET CLR 1.1.4322)',
-      'js_user_agent_family': 'IE Platform Preview',
-      'js_user_agent_v1': '9',
-      'js_user_agent_v2': '0',
-      'js_user_agent_v3': '1'}),
+        'Windows NT 5.1; Trident/4.0; .NET CLR 2.0.50727; .NET CLR 1.1.4322)',
+        'js_user_agent_family': 'IE Platform Preview',
+        'js_user_agent_v1': '9',
+        'js_user_agent_v2': '0',
+        'js_user_agent_v3': '1'}),
     (('Midori', '0', '2', None),
-      'Midori/0.2 (X11; Linux; U; en-us) WebKit/531.2 ,gzip(gfe),gzip(gfe)',
+        'Midori/0.2 (X11; Linux; U; en-us) WebKit/531.2 ,gzip(gfe),gzip(gfe)',
      {}),
     (('MozillaDeveloperPreview', '3', '7', 'a1'),
      'Mozilla/5.0 (Windows; U; Windows NT 6.1; en-US; rv:1.9.3a1) '
      'Gecko/20100208 MozillaDeveloperPreview/3.7a1 '
      '(.NET CLR 3.5.30729),gzip(gfe),gzip(gfe)', {}),
     (('Opera', '10', '53', None),
-      'Opera/9.80 (Windows NT 5.1; U; ru) Presto/2.5.24 Version/10.53',
-      {}),
+        'Opera/9.80 (Windows NT 5.1; U; ru) Presto/2.5.24 Version/10.53',
+        {}),
     (('Opera Mobile', '10', '00', None),
      'Opera/9.80 (S60; SymbOS; Opera Mobi/275; U; es-ES) '
      'Presto/2.4.13 Version/10.00,gzip(gfe),gzip(gfe)', {}),
@@ -84,52 +83,56 @@ TEST_STRINGS = (
      '(KHTML, like Gecko) Version/1.0 Safari/525.27.1 '
      'Desktop/1.0,gzip(gfe),gzip(gfe)', {}),
     (('iPad', '3', '2', None),
-      'Mozilla/5.0 (iPad; U; CPU OS 3_2 like Mac OS X; en-us) '
-      'AppleWebKit/531.21.10 (KHTML, like Gecko) Version/4.0.4 Mobile/7B367 '
-      'Safari/531.21.10,gzip(gfe),gzip(gfe)', {}),
+        'Mozilla/5.0 (iPad; U; CPU OS 3_2 like Mac OS X; en-us) '
+        'AppleWebKit/531.21.10 (KHTML, like Gecko) Version/4.0.4 Mobile/7B367 '
+        'Safari/531.21.10,gzip(gfe),gzip(gfe)', {}),
     (('Dolfin', '2', '0', None),
-      'Mozilla/5.0 (SAMSUNG; SAMSUNG-GT-S8500/S8500XXJEE; U; Bada/1.0; nl-nl) '
-      'AppleWebKit/533.1 (KHTML, like Gecko) Dolfin/2.0 Mobile WVGA '
-      'SMM-MMS/1.2.0 OPN-B', {}),
+        'Mozilla/5.0 (SAMSUNG; SAMSUNG-GT-S8500/S8500XXJEE; U; Bada/1.0; nl-nl) '
+        'AppleWebKit/533.1 (KHTML, like Gecko) Dolfin/2.0 Mobile WVGA '
+        'SMM-MMS/1.2.0 OPN-B', {}),
     (('BOLT', '2', '101', None),
-      'Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; BOLT/2.101) '
-      'AppleWebKit/530  (KHTML, like Gecko) Version/4.0 '
-      'Safari/530.17,gzip(gfe),gzip(gfe)', {}),
+        'Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; BOLT/2.101) '
+        'AppleWebKit/530  (KHTML, like Gecko) Version/4.0 '
+        'Safari/530.17,gzip(gfe),gzip(gfe)', {}),
     (('Blackberry', '6', '0', '0'),
-      'Mozilla/5.0 (BlackBerry; U; BlackBerry 9800; en-GB) AppleWebKit/534.1+ '
-      '(KHTML, like Gecko) Version/6.0.0.141 Mobile '
-      'Safari/534.1+,gzip(gfe),gzip(gfe)', {}),
+        'Mozilla/5.0 (BlackBerry; U; BlackBerry 9800; en-GB) AppleWebKit/534.1+ '
+        '(KHTML, like Gecko) Version/6.0.0.141 Mobile '
+        'Safari/534.1+,gzip(gfe),gzip(gfe)', {}),
 )
 
 
 
 class ParseTest(unittest.TestCase):
 
-  def testStrings(self):
-    for (family, v1, v2, v3), user_agent_string, kwds in TEST_STRINGS:
-      self.assertEqual((family, v1, v2, v3),
-                       user_agent_parser.Parse(user_agent_string, **kwds))
+    def testStrings(self):
+        for (family, v1, v2, v3), user_agent_string, kwds in TEST_STRINGS:
+            self.assertEqual((family, v1, v2, v3),
+                    user_agent_parser.Parse(user_agent_string, **kwds))
 
 
 class GetFiltersTest(unittest.TestCase):
-  def testGetFiltersNoMatchesGiveEmptyDict(self):
-    user_agent_string = 'foo'
-    filters = user_agent_parser.GetFilters(
-        user_agent_string, js_user_agent_string=None)
-    self.assertEqual({}, filters)
 
-  def testGetFiltersJsUaPassedThrough(self):
-    user_agent_string = 'foo'
-    filters = user_agent_parser.GetFilters(
-        user_agent_string, js_user_agent_string='bar')
-    self.assertEqual({'js_user_agent_string': 'bar'}, filters)
+    def testGetFiltersNoMatchesGiveEmptyDict(self):
+        user_agent_string = 'foo'
+        filters = user_agent_parser.GetFilters(
+                user_agent_string, js_user_agent_string=None)
+        self.assertEqual({}, filters)
 
-  def testGetFiltersJsUserAgentFamilyAndVersions(self):
-    user_agent_string = ('Mozilla/4.0 (compatible; MSIE 8.0; '
-      'Windows NT 5.1; Trident/4.0; GTB6; .NET CLR 2.0.50727; '
-      '.NET CLR 3.0.4506.2152; .NET CLR 3.5.30729)')
-    filters = user_agent_parser.GetFilters(
-        user_agent_string, js_user_agent_string='bar',
-        js_user_agent_family='foo')
-    self.assertEqual({'js_user_agent_string': 'bar',
-                      'js_user_agent_family': 'foo'}, filters)
+    def testGetFiltersJsUaPassedThrough(self):
+        user_agent_string = 'foo'
+        filters = user_agent_parser.GetFilters(
+                user_agent_string, js_user_agent_string='bar')
+        self.assertEqual({'js_user_agent_string': 'bar'}, filters)
+
+    def testGetFiltersJsUserAgentFamilyAndVersions(self):
+        user_agent_string = ('Mozilla/4.0 (compatible; MSIE 8.0; '
+                'Windows NT 5.1; Trident/4.0; GTB6; .NET CLR 2.0.50727; '
+                '.NET CLR 3.0.4506.2152; .NET CLR 3.5.30729)')
+        filters = user_agent_parser.GetFilters(
+                user_agent_string, js_user_agent_string='bar',
+                js_user_agent_family='foo')
+        self.assertEqual({'js_user_agent_string': 'bar',
+            'js_user_agent_family': 'foo'}, filters)
+
+if __name__ == '__main__':
+    unittest.main()

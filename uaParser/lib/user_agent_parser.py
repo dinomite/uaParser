@@ -62,6 +62,7 @@ class UserAgentParser(object):
                     v3 = match.group(4)
         return family, v1, v2, v3
 
+
 def Parse(user_agent_string, js_user_agent_string=None,
                     js_user_agent_family=None,
                     js_user_agent_v1=None,
@@ -82,7 +83,6 @@ def Parse(user_agent_string, js_user_agent_string=None,
         [family, v1, v2, v3]
         e.g. ['Chrome', '4', '0', '203']
     """
-
 
     # Override via JS properties.
     if js_user_agent_family is not None and js_user_agent_family != '':
@@ -110,6 +110,48 @@ def Parse(user_agent_string, js_user_agent_string=None,
 
     return family or 'Other', v1, v2, v3
 
+def GetFilters(user_agent_string, js_user_agent_string=None,
+                             js_user_agent_family=None,
+                             js_user_agent_v1=None,
+                             js_user_agent_v2=None,
+                             js_user_agent_v3=None):
+    """Return the optional arguments that should be saved and used to query.
+
+    js_user_agent_string is always returned if it is present. We really only need
+    it for Chrome Frame. However, I added it in the generally case to find other
+    cases when it is different. When the recording of js_user_agent_string was
+    added, we created new records for all new user agents.
+
+    Since we only added js_document_mode for the IE 9 preview case, it did not
+    cause new user agent records the way js_user_agent_string did.
+
+    js_document_mode has since been removed in favor of individual property
+    overrides.
+
+    Args:
+        user_agent_string: The full user-agent string.
+        js_user_agent_string: JavaScript ua string from client-side
+        js_user_agent_family: This is an override for the family name to deal
+                with the fact that IE platform preview (for instance) cannot be
+                distinguished by user_agent_string, but only in javascript.
+        js_user_agent_v1: v1 override - see above.
+        js_user_agent_v2: v1 override - see above.
+        js_user_agent_v3: v1 override - see above.
+    Returns:
+        {js_user_agent_string: '[...]', js_family_name: '[...]', etc...}
+    """
+    filters = {}
+    filterdict = {
+        'js_user_agent_string': js_user_agent_string,
+        'js_user_agent_family': js_user_agent_family,
+        'js_user_agent_v1': js_user_agent_v1,
+        'js_user_agent_v2': js_user_agent_v2,
+        'js_user_agent_v3': js_user_agent_v3
+    }
+    for key, value in filterdict.items():
+        if value is not None and value != '':
+            filters[key] = value
+    return filters
 
 
 browser_slash_v123_names = (
@@ -135,6 +177,10 @@ USER_AGENT_PARSERS = (
     # must go before Browser/v1.v2 - eg: Minefield/3.1a1pre
     _P(r'(Namoroka|Shiretoko|Minefield)/(\d+)\.(\d+)\.(\d+(?:pre)?)',
          'Firefox ($1)'),
+    _P(r'(Firefox)/(\d+)\.(\d+)([ab]\d+[a-z]*)',
+         'Firefox Beta'),
+    _P(r'(Firefox)-(?:\d+\.\d+)?/(\d+)\.(\d+)([ab]\d+[a-z]*)',
+         'Firefox Beta'),
     _P(r'(Namoroka|Shiretoko|Minefield)/(\d+)\.(\d+)([ab]\d+[a-z]*)?',
          'Firefox ($1)'),
     _P(r'(MozillaDeveloperPreview)/(\d+)\.(\d+)([ab]\d+[a-z]*)?'),
