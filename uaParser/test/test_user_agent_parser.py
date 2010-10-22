@@ -20,8 +20,7 @@ __author__ = 'slamm@google.com (Stephen Lamm)'
 
 import unittest
 
-from models import user_agent_parser
-
+from uaParser.lib.user_agent import UserAgent
 
 CHROME_UA_STRING = (
     'Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US) AppleWebKit/530.1 '
