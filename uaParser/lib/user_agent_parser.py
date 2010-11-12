@@ -19,18 +19,18 @@
 import re
 
 class UserAgentParser(object):
-    def __init__(self, pattern, family_replacement=None, v1_replacement=None):
+    def __init__(self, pattern, family_replacement=None, major_version_replacement=None):
         """Initialize UserAgentParser.
 
         Args:
             pattern: a regular expression string
             family_replacement: a string to override the matched family (optional)
-            v1_replacement: a string to override the matched v1 (optional)
+            major_version_replacement: a string to override the matched major_version (optional)
         """
         self.pattern = pattern
         self.user_agent_re = re.compile(self.pattern)
         self.family_replacement = family_replacement
-        self.v1_replacement = v1_replacement
+        self.major_version_replacement = major_version_replacement
 
     def MatchSpans(self, user_agent_string):
         match_spans = []
@@ -41,7 +41,7 @@ class UserAgentParser(object):
         return match_spans
 
     def Parse(self, user_agent_string):
-        family, v1, v2, v3 = None, None, None, None
+        family, major_version, minor_version, beta_version = None, None, None, None
         match = self.user_agent_re.search(user_agent_string)
         if match:
             if self.family_replacement:
@@ -52,22 +52,22 @@ class UserAgentParser(object):
             else:
                 family = match.group(1)
 
-            if self.v1_replacement:
-                v1 = self.v1_replacement
+            if self.major_version_replacement:
+                major_version = self.major_version_replacement
             elif match.lastindex >= 2:
-                v1 = match.group(2)
+                major_version = match.group(2)
             if match.lastindex >= 3:
-                v2 = match.group(3)
+                minor_version = match.group(3)
                 if match.lastindex >= 4:
-                    v3 = match.group(4)
-        return family, v1, v2, v3
+                    beta_version = match.group(4)
+        return family, major_version, minor_version, beta_version
 
 
 def Parse(user_agent_string, js_user_agent_string=None,
                     js_user_agent_family=None,
-                    js_user_agent_v1=None,
-                    js_user_agent_v2=None,
-                    js_user_agent_v3=None):
+                    js_user_agent_major_version=None,
+                    js_user_agent_minor_version=None,
+                    js_user_agent_beta_version=None):
     """Parses the user-agent string and returns the bits.
 
     Args:
@@ -76,45 +76,45 @@ def Parse(user_agent_string, js_user_agent_string=None,
         js_user_agent_family: This is an override for the family name to deal
                 with the fact that IE platform preview (for instance) cannot be
                 distinguished by user_agent_string, but only in javascript.
-        js_user_agent_v1: v1 override - see above.
-        js_user_agent_v2: v1 override - see above.
-        js_user_agent_v3: v1 override - see above.
+        js_user_agent_major_version: major_version override - see above.
+        js_user_agent_minor_version: major_version override - see above.
+        js_user_agent_beta_version: major_version override - see above.
     Returns:
-        [family, v1, v2, v3]
+        [family, major_version, minor_version, beta_version]
         e.g. ['Chrome', '4', '0', '203']
     """
 
     # Override via JS properties.
     if js_user_agent_family is not None and js_user_agent_family != '':
         family = js_user_agent_family
-        v1 = None
-        v2 = None
-        v3 = None
-        if js_user_agent_v1 is not None:
-            v1 = js_user_agent_v1
-        if js_user_agent_v2 is not None:
-            v2 = js_user_agent_v2
-        if js_user_agent_v3 is not None:
-            v3 = js_user_agent_v3
+        major_version = None
+        minor_version = None
+        beta_version = None
+        if js_user_agent_major_version is not None:
+            major_version = js_user_agent_major_version
+        if js_user_agent_minor_version is not None:
+            minor_version = js_user_agent_minor_version
+        if js_user_agent_beta_version is not None:
+            beta_version = js_user_agent_beta_version
     else:
         for parser in USER_AGENT_PARSERS:
-            family, v1, v2, v3 = parser.Parse(user_agent_string)
+            family, major_version, minor_version, beta_version = parser.Parse(user_agent_string)
             if family:
                 break
 
     # Override for Chrome Frame IFF Chrome is enabled.
     if (js_user_agent_string and js_user_agent_string.find('Chrome/') > -1 and
             user_agent_string.find('chromeframe') > -1):
-        family = 'Chrome Frame (%s %s)' % (family, v1)
-        cf_family, v1, v2, v3 = Parse(js_user_agent_string)
+        family = 'Chrome Frame (%s %s)' % (family, major_version)
+        cf_family, major_version, minor_version, beta_version = Parse(js_user_agent_string)
 
-    return family or 'Other', v1, v2, v3
+    return family or 'Other', major_version, minor_version, beta_version
 
 def GetFilters(user_agent_string, js_user_agent_string=None,
                              js_user_agent_family=None,
-                             js_user_agent_v1=None,
-                             js_user_agent_v2=None,
-                             js_user_agent_v3=None):
+                             js_user_agent_major_version=None,
+                             js_user_agent_minor_version=None,
+                             js_user_agent_beta_version=None):
     """Return the optional arguments that should be saved and used to query.
 
     js_user_agent_string is always returned if it is present. We really only need
@@ -134,9 +134,9 @@ def GetFilters(user_agent_string, js_user_agent_string=None,
         js_user_agent_family: This is an override for the family name to deal
                 with the fact that IE platform preview (for instance) cannot be
                 distinguished by user_agent_string, but only in javascript.
-        js_user_agent_v1: v1 override - see above.
-        js_user_agent_v2: v1 override - see above.
-        js_user_agent_v3: v1 override - see above.
+        js_user_agent_major_version: major_version override - see above.
+        js_user_agent_minor_version: major_version override - see above.
+        js_user_agent_beta_version: major_version override - see above.
     Returns:
         {js_user_agent_string: '[...]', js_family_name: '[...]', etc...}
     """
@@ -144,9 +144,9 @@ def GetFilters(user_agent_string, js_user_agent_string=None,
     filterdict = {
         'js_user_agent_string': js_user_agent_string,
         'js_user_agent_family': js_user_agent_family,
-        'js_user_agent_v1': js_user_agent_v1,
-        'js_user_agent_v2': js_user_agent_v2,
-        'js_user_agent_v3': js_user_agent_v3
+        'js_user_agent_major_version': js_user_agent_major_version,
+        'js_user_agent_minor_version': js_user_agent_minor_version,
+        'js_user_agent_beta_version': js_user_agent_beta_version
     }
     for key, value in filterdict.items():
         if value is not None and value != '':
@@ -154,14 +154,14 @@ def GetFilters(user_agent_string, js_user_agent_string=None,
     return filters
 
 
-browser_slash_v123_names = (
+browser_slash_version_names = (
         'Jasmine|ANTGalio|Midori|Fresco|Lobo|Maxthon|Lynx|OmniWeb|Dillo|Camino|'
         'Demeter|Fluid|Fennec|Shiira|Sunrise|Chrome|Flock|Netscape|Lunascape|'
         'Epiphany|WebPilot|Vodafone|NetFront|Konqueror|SeaMonkey|Kazehakase|'
         'Vienna|Iceape|Iceweasel|IceWeasel|Iron|K-Meleon|Sleipnir|Galeon|'
         'GranParadiso|Opera Mini|iCab|NetNewsWire|Iron|Iris')
 
-browser_slash_v12_names = (
+browser_slash_main_version_names = (
         'Bolt|Jasmine|Midori|Maxthon|Lynx|Arora|IBrowse|Dillo|Camino|Shiira|Fennec|'
         'Phoenix|Chrome|Flock|Netscape|Lunascape|Epiphany|WebPilot|'
         'Opera Mini|Opera|Vodafone|'
@@ -174,7 +174,7 @@ USER_AGENT_PARSERS = (
     #### SPECIAL CASES TOP ####
     # must go before Opera
     _P(r'^(Opera)/(\d+)\.(\d+) \(Nintendo Wii', family_replacement='Wii'),
-    # must go before Browser/v1.v2 - eg: Minefield/3.1a1pre
+    # must go before Browser/major_version.minor_version - eg: Minefield/3.1a1pre
     _P(r'(Namoroka|Shiretoko|Minefield)/(\d+)\.(\d+)\.(\d+(?:pre)?)',
          'Firefox ($1)'),
     _P(r'(Firefox)/(\d+)\.(\d+)([ab]\d+[a-z]*)',
@@ -215,13 +215,13 @@ USER_AGENT_PARSERS = (
     #### END SPECIAL CASES TOP ####
 
     #### MAIN CASES - this catches > 50% of all browsers ####
-    # Browser/v1.v2.v3
-    _P(r'(%s)/(\d+)\.(\d+)\.(\d+)' % browser_slash_v123_names),
-    # Browser/v1.v2
-    _P(r'(%s)/(\d+)\.(\d+)' % browser_slash_v12_names),
-    # Browser v1.v2.v3 (space instead of slash)
+    # Browser/major_version.minor_version.beta_version
+    _P(r'(%s)/(\d+)\.(\d+)\.(\d+)' % browser_slash_version_names),
+    # Browser/major_version.minor_version
+    _P(r'(%s)/(\d+)\.(\d+)' % browser_slash_main_version_names),
+    # Browser major_version.minor_version.beta_version (space instead of slash)
     _P(r'(iRider|Crazy Browser|SkipStone|iCab|Lunascape|Sleipnir|Maemo Browser) (\d+)\.(\d+)\.(\d+)'),
-    # Browser v1.v2 (space instead of slash)
+    # Browser major_version.minor_version (space instead of slash)
     _P(r'(iCab|Lunascape|Opera|Android) (\d+)\.(\d+)'),
     _P(r'(IEMobile) (\d+)\.(\d+)', 'IE Mobile'),
     # DO THIS AFTER THE EDGE CASES ABOVE!
@@ -233,7 +233,7 @@ USER_AGENT_PARSERS = (
     #_P(r''),
     _P(r'(Obigo|OBIGO)[^\d]*(\d+)(?:.(\d+))?', 'Obigo'),
     _P(r'(MAXTHON|Maxthon) (\d+)\.(\d+)', family_replacement='Maxthon'),
-    _P(r'(Maxthon|MyIE2|Uzbl|Shiira)', v1_replacement='0'),
+    _P(r'(Maxthon|MyIE2|Uzbl|Shiira)', major_version_replacement='0'),
     _P(r'(PLAYSTATION) (\d+)', family_replacement='PlayStation'),
     _P(r'(PlayStation Portable)[^\d]+(\d+).(\d+)'),
     _P(r'(BrowseX) \((\d+)\.(\d+)\.(\d+)'),
@@ -241,7 +241,7 @@ USER_AGENT_PARSERS = (
     _P(r'(BonEcho)/(\d+)\.(\d+)\.(\d+)', 'Bon Echo'),
     _P(r'(iPhone) OS (\d+)_(\d+)(?:_(\d+))?'),
     _P(r'(iPad).+ OS (\d+)_(\d+)(?:_(\d+))?'),
-    _P(r'(Avant)', v1_replacement='1'),
+    _P(r'(Avant)', major_version_replacement='1'),
     _P(r'(Nokia)[EN]?(\d+)'),
     _P(r'(Black[bB]erry).+Version\/(\d+)\.(\d+)\.(\d+)',
             family_replacement='Blackberry'),
@@ -257,10 +257,10 @@ USER_AGENT_PARSERS = (
     _P(r'(Version)/(\d+)\.(\d+)(?:\.(\d+))?.*Safari/',
          family_replacement='Safari'),
     _P(r'(OLPC)/Update(\d+)\.(\d+)'),
-    _P(r'(OLPC)/Update()\.(\d+)', v1_replacement='0'),
+    _P(r'(OLPC)/Update()\.(\d+)', major_version_replacement='0'),
     _P(r'(SamsungSGHi560)', family_replacement='Samsung SGHi560'),
     _P(r'^(SonyEricssonK800i)', family_replacement='Sony Ericsson K800i'),
     _P(r'(Teleca Q7)'),
     _P(r'(MSIE) (\d+)\.(\d+)', family_replacement='IE'),
 )
-# select family, v1, v2, v3 from user_agent where v3 regexp '[a-zA-Z]' group by family, v1, v2, v3;
+# select family, major_version, minor_version, beta_version from user_agent where beta_version regexp '[a-zA-Z]' group by family, major_version, minor_version, beta_version;

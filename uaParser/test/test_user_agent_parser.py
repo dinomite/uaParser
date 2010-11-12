@@ -27,7 +27,7 @@ CHROME_UA_STRING = (
     '(KHTML, like Gecko) Chrome/2.0.169.1 Safari/530.1')
 
 TEST_STRINGS = (
-    # ((family, v1, v2, v3), user_agent_string)
+    # ((family, major_version, minor_version, beta_version), user_agent_string)
     (('Firefox (Shiretoko)', '3', '5', '1pre'),
      'Mozilla/5.0 (X11; U; Linux i686; en-US; rv:1.9.1.1pre) '
      'Gecko/20090717 Ubuntu/9.04 (jaunty) Shiretoko/3.5.1pre', {}),
@@ -62,9 +62,9 @@ TEST_STRINGS = (
      {'js_user_agent_string': 'Mozilla/4.0 (compatible; MSIE 8.0; '
         'Windows NT 5.1; Trident/4.0; .NET CLR 2.0.50727; .NET CLR 1.1.4322)',
         'js_user_agent_family': 'IE Platform Preview',
-        'js_user_agent_v1': '9',
-        'js_user_agent_v2': '0',
-        'js_user_agent_v3': '1'}),
+        'js_user_agent_major_version': '9',
+        'js_user_agent_minor_version': '0',
+        'js_user_agent_beta_version': '1'}),
     (('Midori', '0', '2', None),
         'Midori/0.2 (X11; Linux; U; en-us) WebKit/531.2 ,gzip(gfe),gzip(gfe)',
      {}),
@@ -105,8 +105,8 @@ TEST_STRINGS = (
 class ParseTest(unittest.TestCase):
 
     def testStrings(self):
-        for (family, v1, v2, v3), user_agent_string, kwds in TEST_STRINGS:
-            self.assertEqual((family, v1, v2, v3),
+        for (family, major_version, minor_version, beta_version), user_agent_string, kwds in TEST_STRINGS:
+            self.assertEqual((family, major_version, minor_version, beta_version),
                     user_agent_parser.Parse(user_agent_string, **kwds))
 
 
