@@ -18,45 +18,8 @@ import re
 
 import user_agent_parser
 
-# Mainly used for SeedDatastore.
-# You may want models.result_stats.py
-TOP_USER_AGENT_STRINGS = (
-    ('Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US) '
-     'AppleWebKit/530.1 (KHTML, like Gecko) '
-     'Chrome/2.0.169 Safari/530.1'),
-    ('Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US) '
-     'AppleWebKit/530.1 (KHTML, like Gecko) '
-     'Chrome/3.0.169.1 Safari/530.1'),
-    ('Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US) '
-     'AppleWebKit/530.1 (KHTML, like Gecko) '
-     'Chrome/4.0.169.1 Safari/530.1'),
-    ('Mozilla/5.0 (X11; U; Linux i686; en-US; rv:1.9.0.6) '
-     'Gecko/2009011912 Firefox/3.0.3'),
-    ('Mozilla/5.0 (X11; U; Linux i686; en-US; rv:1.9.0.6) '
-     'Gecko/2009011912 Firefox/3.5.3'),
-    ('Mozilla/4.0 '
-     '(compatible; MSIE 6.0; Windows NT 5.1; Trident/4.0; '
-     '.NET CLR 2.0.50727; .NET CLR 1.1.4322; '
-     '.NET CLR 3.0.04506.648; .NET CLR 3.5.21022)'),
-    ('Mozilla/4.0 '
-     '(compatible; MSIE 7.0; Windows NT 5.1; Trident/4.0; '
-     '.NET CLR 2.0.50727; .NET CLR 1.1.4322; '
-     '.NET CLR 3.0.04506.648; .NET CLR 3.5.21022)'),
-    ('Mozilla/4.0 '
-     '(compatible; MSIE 8.0; Windows NT 5.1; Trident/4.0; '
-     '.NET CLR 2.0.50727; .NET CLR 1.1.4322; '
-     '.NET CLR 3.0.04506.648; .NET CLR 3.5.21022)'),
-    'Opera/9.64 (Windows NT 5.1; U; en) Presto/2.1.1',
-    'Opera/10.00 (Windows NT 5.1; U; en) Presto/2.2.0',
-    ('Mozilla/5.0 (Macintosh; U; Intel Mac OS X 10_4_11; en) '
-     'AppleWebKit/525.27.1 (KHTML, like Gecko) Version/3.2.1 Safari/525.27.1'),
-    ('Mozilla/5.0 (Macintosh; U; Intel Mac OS X 10_4_11; en) '
-     'AppleWebKit/525.27.1 (KHTML, like Gecko) Version/4.0.1 Safari/525.27.1'),
-)
-
-
 class UserAgent():
-    """User Agent Model."""
+    """User Agent Object"""
     string = ""
     family = ""
     major_version = ""
