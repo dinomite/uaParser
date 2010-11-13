@@ -18,67 +18,30 @@ import re
 
 import user_agent_parser
 
-# Mainly used for SeedDatastore.
-# You may want models.result_stats.py
-TOP_USER_AGENT_STRINGS = (
-    ('Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US) '
-     'AppleWebKit/530.1 (KHTML, like Gecko) '
-     'Chrome/2.0.169 Safari/530.1'),
-    ('Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US) '
-     'AppleWebKit/530.1 (KHTML, like Gecko) '
-     'Chrome/3.0.169.1 Safari/530.1'),
-    ('Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US) '
-     'AppleWebKit/530.1 (KHTML, like Gecko) '
-     'Chrome/4.0.169.1 Safari/530.1'),
-    ('Mozilla/5.0 (X11; U; Linux i686; en-US; rv:1.9.0.6) '
-     'Gecko/2009011912 Firefox/3.0.3'),
-    ('Mozilla/5.0 (X11; U; Linux i686; en-US; rv:1.9.0.6) '
-     'Gecko/2009011912 Firefox/3.5.3'),
-    ('Mozilla/4.0 '
-     '(compatible; MSIE 6.0; Windows NT 5.1; Trident/4.0; '
-     '.NET CLR 2.0.50727; .NET CLR 1.1.4322; '
-     '.NET CLR 3.0.04506.648; .NET CLR 3.5.21022)'),
-    ('Mozilla/4.0 '
-     '(compatible; MSIE 7.0; Windows NT 5.1; Trident/4.0; '
-     '.NET CLR 2.0.50727; .NET CLR 1.1.4322; '
-     '.NET CLR 3.0.04506.648; .NET CLR 3.5.21022)'),
-    ('Mozilla/4.0 '
-     '(compatible; MSIE 8.0; Windows NT 5.1; Trident/4.0; '
-     '.NET CLR 2.0.50727; .NET CLR 1.1.4322; '
-     '.NET CLR 3.0.04506.648; .NET CLR 3.5.21022)'),
-    'Opera/9.64 (Windows NT 5.1; U; en) Presto/2.1.1',
-    'Opera/10.00 (Windows NT 5.1; U; en) Presto/2.2.0',
-    ('Mozilla/5.0 (Macintosh; U; Intel Mac OS X 10_4_11; en) '
-     'AppleWebKit/525.27.1 (KHTML, like Gecko) Version/3.2.1 Safari/525.27.1'),
-    ('Mozilla/5.0 (Macintosh; U; Intel Mac OS X 10_4_11; en) '
-     'AppleWebKit/525.27.1 (KHTML, like Gecko) Version/4.0.1 Safari/525.27.1'),
-)
-
-
 class UserAgent():
-    """User Agent Model."""
+    """User Agent Object"""
     string = ""
     family = ""
-    v1 = ""
-    v2 = ""
-    v3 = ""
+    major_version = ""
+    minor_version = ""
+    beta_version = ""
     confirmed = ""
     created = ""
 
-    def __init__(self, string, family, v1, v2, v3):
+    def __init__(self, string, family, major_version, minor_version, beta_version):
         self.string = string
         self.family = family
-        self.v1 = v1
-        self.v2 = v2
-        self.v3 = v3
+        self.major_version = major_version
+        self.minor_version = minor_version
+        self.beta_version = beta_version
 
     def pretty(self):
         """Invokes pretty print."""
-        return self.pretty_print(self.family, self.v1, self.v2, self.v3)
+        return self.pretty_print(self.family, self.major_version, self.minor_version, self.beta_version)
 
     def get_string_list(self):
         """Returns a list of a strings suitable a StringListProperty."""
-        return self.parts_to_string_list(self.family, self.v1, self.v2, self.v3)
+        return self.parts_to_string_list(self.family, self.major_version, self.minor_version, self.beta_version)
 
     @classmethod
     def factory(cls, string, **kwds):
@@ -91,8 +54,8 @@ class UserAgent():
         """
         normal_string = string.replace(',gzip(gfe)', '')
 
-        family, v1, v2, v3 = user_agent_parser.Parse(string)
-        user_agent = cls(string=string, family=family, v1=v1, v2=v2, v3=v3)
+        family, major_version, minor_version, beta_version = user_agent_parser.Parse(string)
+        user_agent = cls(string=string, family=family, major_version=major_version, minor_version=minor_version, beta_version=beta_version)
 
         return user_agent
 
@@ -103,24 +66,24 @@ class UserAgent():
         Args:
             pretty_string: a user agent pretty string (e.g. 'Chrome 4.0.203')
         Returns:
-            [family, v1, v2, v3]
+            [family, major_version, minor_version, beta_version]
             e.g. ['Chrome', '4', '0', '203']
         """
-        v1, v2, v3 = None, None, None
+        major_version, minor_version, beta_version = None, None, None
         family, sep, version_str = pretty_string.rpartition(' ')
         if not family:
             family = version_str
         else:
             version_bits = version_str.split('.')
-            v1 = version_bits.pop(0)
-            if not v1.isdigit():
+            major_version = version_bits.pop(0)
+            if not major_version.isdigit():
                 family = pretty_string
-                v1 = None
+                major_version = None
             elif version_bits:
-                v2 = version_bits.pop(0)
+                minor_version = version_bits.pop(0)
                 if version_bits:
-                    v3 = version_bits.pop(0)
-        return family, v1, v2, v3
+                    beta_version = version_bits.pop(0)
+        return family, major_version, minor_version, beta_version
 
 
     @staticmethod
@@ -139,21 +102,21 @@ class UserAgent():
         return []
 
     @staticmethod
-    def pretty_print(family, v1=None, v2=None, v3=None):
+    def pretty_print(family, major_version=None, minor_version=None, beta_version=None):
         """Pretty browser string."""
-        if v3:
-            if v3[0].isdigit():
-                return '%s %s.%s.%s' % (family, v1, v2, v3)
+        if beta_version:
+            if beta_version[0].isdigit():
+                return '%s %s.%s.%s' % (family, major_version, minor_version, beta_version)
             else:
-                return '%s %s.%s%s' % (family, v1, v2, v3)
-        elif v2:
-            return '%s %s.%s' % (family, v1, v2)
-        elif v1:
-            return '%s %s' % (family, v1)
+                return '%s %s.%s%s' % (family, major_version, minor_version, beta_version)
+        elif minor_version:
+            return '%s %s.%s' % (family, major_version, minor_version)
+        elif major_version:
+            return '%s %s' % (family, major_version)
         return family
 
     @classmethod
-    def parts_to_string_list(cls, family, v1=None, v2=None, v3=None):
+    def parts_to_string_list(cls, family, major_version=None, minor_version=None, beta_version=None):
         """Return a list of user agent version strings.
 
         e.g. ['Firefox', 'Firefox 3', 'Firefox 3.5']
@@ -161,12 +124,12 @@ class UserAgent():
         string_list = []
         if family:
             string_list.append(family)
-            if v1:
-                string_list.append(cls.pretty_print(family, v1))
-                if v2:
-                    string_list.append(cls.pretty_print(family, v1, v2))
-                    if v3:
-                        string_list.append(cls.pretty_print(family, v1, v2, v3))
+            if major_version:
+                string_list.append(cls.pretty_print(family, major_version))
+                if minor_version:
+                    string_list.append(cls.pretty_print(family, major_version, minor_version))
+                    if beta_version:
+                        string_list.append(cls.pretty_print(family, major_version, minor_version, beta_version))
         return string_list
 
     @classmethod
