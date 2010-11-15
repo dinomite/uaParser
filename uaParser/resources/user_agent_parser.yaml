@@ -1,17 +1,6 @@
-browser_slash_version_names: >
-        Jasmine|ANTGalio|Midori|Fresco|Lobo|Maxthon|Lynx|OmniWeb|Dillo|Camino|
-        Demeter|Fluid|Fennec|Shiira|Sunrise|Chrome|Flock|Netscape|Lunascape|
-        Epiphany|WebPilot|Vodafone|NetFront|Konqueror|SeaMonkey|Kazehakase|
-        Vienna|Iceape|Iceweasel|IceWeasel|Iron|K-Meleon|Sleipnir|Galeon|
-        GranParadiso|Opera Mini|iCab|NetNewsWire|Iron|Iris
+browser_slash_version_names: Jasmine|ANTGalio|Midori|Fresco|Lobo|Maxthon|Lynx|OmniWeb|Dillo|Camino|Demeter|Fluid|Fennec|Shiira|Sunrise|Chrome|Flock|Netscape|Lunascape|Epiphany|WebPilot|Vodafone|NetFront|Konqueror|SeaMonkey|Kazehakase|Vienna|Iceape|Iceweasel|IceWeasel|Iron|K-Meleon|Sleipnir|Galeon|GranParadiso|Opera Mini|iCab|NetNewsWire|Iron|Iris
 
-browser_slash_main_version_names: >
-        Bolt|Jasmine|Midori|Maxthon|Lynx|Arora|IBrowse|Dillo|Camino|Shiira|Fennec|
-        Phoenix|Chrome|Flock|Netscape|Lunascape|Epiphany|WebPilot|
-        Opera Mini|Opera|Vodafone|
-        NetFront|Konqueror|SeaMonkey|Kazehakase|Vienna|Iceape|Iceweasel|IceWeasel|
-        Iron|K-Meleon|Sleipnir|Galeon|GranParadiso|
-        iCab|NetNewsWire|Iron|Space Bison|Stainless|Orca|Dolfin|BOLT
+browser_slash_main_version_names: Bolt|Jasmine|Midori|Maxthon|Lynx|Arora|IBrowse|Dillo|Camino|Shiira|Fennec|Phoenix|Chrome|Flock|Netscape|Lunascape|Epiphany|WebPilot|Opera Mini|Opera|Vodafone|NetFront|Konqueror|SeaMonkey|Kazehakase|Vienna|Iceape|Iceweasel|IceWeasel|Iron|K-Meleon|Sleipnir|Galeon|GranParadiso|iCab|NetNewsWire|Iron|Space Bison|Stainless|Orca|Dolfin|BOLT
 
 user_agent_parsers:
     #### SPECIAL CASES TOP ####
@@ -69,9 +58,9 @@ user_agent_parsers:
 
     #### MAIN CASES - this catches > 50% of all browsers ####
     # Browser/major_version.minor_version.beta_version
-    - regex: '(%s)/(\d+)\.(\d+)\.(\d+)' % browser_slash_version_names
+    - regex: '(%s)/(\d+)\.(\d+)\.(\d+) % browser_slash_version_names'
     # Browser/major_version.minor_version
-    - regex: '(%s)/(\d+)\.(\d+)' % browser_slash_main_version_names
+    - regex: '(%s)/(\d+)\.(\d+) % browser_slash_main_version_names'
     # Browser major_version.minor_version.beta_version (space instead of slash)
     - regex: '(iRider|Crazy Browser|SkipStone|iCab|Lunascape|Sleipnir|Maemo Browser) (\d+)\.(\d+)\.(\d+)'
     # Browser major_version.minor_version (space instead of slash)
@@ -98,7 +87,7 @@ user_agent_parsers:
     - regex: '(POLARIS)/(\d+)\.(\d+)'
       family_replacement: 'Polaris'
     - regex: '(BonEcho)/(\d+)\.(\d+)\.(\d+)'
-      'Bon Echo'
+      family_replacement: 'Bon Echo'
     - regex: '(iPhone) OS (\d+)_(\d+)(?:_(\d+))?'
     - regex: '(iPad).+ OS (\d+)_(\d+)(?:_(\d+))?'
     - regex: '(Avant)'
@@ -110,9 +99,9 @@ user_agent_parsers:
       family_replacement: 'Blackberry'
     - regex: '(OmniWeb)/v(\d+)\.(\d+)'
     - regex: '(Blazer)/(\d+)\.(\d+)'
-    'Palm Blazer'
+      family_replacement: 'Palm Blazer'
     - regex: '(Pre)/(\d+)\.(\d+)'
-    'Palm Pre'
+      family_replacement: 'Palm Pre'
     - regex: '(Links) \((\d+)\.(\d+)'
     - regex: '(QtWeb) Internet Browser/(\d+)\.(\d+)'
     #- regex: '\(iPad;.+(Version)/(\d+)\.(\d+)(?:\.(\d+))?.*Safari/'

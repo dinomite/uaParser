@@ -17,6 +17,7 @@
 """Shared models."""
 
 import re
+import yaml
 
 class UserAgentParser(object):
     def __init__(self, pattern, family_replacement=None, major_version_replacement=None):
@@ -154,20 +155,12 @@ def GetFilters(user_agent_string, js_user_agent_string=None,
     return filters
 
 
-browser_slash_version_names = (
-        'Jasmine|ANTGalio|Midori|Fresco|Lobo|Maxthon|Lynx|OmniWeb|Dillo|Camino|'
-        'Demeter|Fluid|Fennec|Shiira|Sunrise|Chrome|Flock|Netscape|Lunascape|'
-        'Epiphany|WebPilot|Vodafone|NetFront|Konqueror|SeaMonkey|Kazehakase|'
-        'Vienna|Iceape|Iceweasel|IceWeasel|Iron|K-Meleon|Sleipnir|Galeon|'
-        'GranParadiso|Opera Mini|iCab|NetNewsWire|Iron|Iris')
+yamlFile = open('uaParser/resources/user_agent_parser.yaml')
+yaml = yaml.load(yamlFile)
+yamlFile.close()
 
-browser_slash_main_version_names = (
-        'Bolt|Jasmine|Midori|Maxthon|Lynx|Arora|IBrowse|Dillo|Camino|Shiira|Fennec|'
-        'Phoenix|Chrome|Flock|Netscape|Lunascape|Epiphany|WebPilot|'
-        'Opera Mini|Opera|Vodafone|'
-        'NetFront|Konqueror|SeaMonkey|Kazehakase|Vienna|Iceape|Iceweasel|IceWeasel|'
-        'Iron|K-Meleon|Sleipnir|Galeon|GranParadiso|'
-        'iCab|NetNewsWire|Iron|Space Bison|Stainless|Orca|Dolfin|BOLT')
+browser_slash_version_names = yaml['browser_slash_version_names']
+browser_slash_main_version_names = yaml['browser_slash_main_version_names']
 
 _P = UserAgentParser
 USER_AGENT_PARSERS = (
