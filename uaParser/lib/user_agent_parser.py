@@ -16,6 +16,7 @@
 
 """Shared models."""
 
+import os
 import re
 import yaml
 
@@ -156,7 +157,8 @@ def GetFilters(user_agent_string, js_user_agent_string=None,
 
 
 # Build the list of user agent parsers from YAML
-yamlFile = open('uaParser/resources/user_agent_parser.yaml')
+rootDir = os.path.abspath(os.path.dirname(os.path.dirname(__file__)))
+yamlFile = open(rootDir + '/resources/user_agent_parser.yaml')
 yaml = yaml.load(yamlFile)
 yamlFile.close()
 
