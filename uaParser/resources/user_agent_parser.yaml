@@ -17,6 +17,9 @@ user_agent_parsers:
     # e.g.: Flock/2.0b2
     - regex: '(Flock)/(\d+)\.(\d+)(b\d+?)'
 
+    # RockMelt
+    - regex: '(RockMelt)/(\d+)\.(\d+)\.(\d+)'
+
     # e.g.: Fennec/0.9pre
     - regex: '(Fennec)/(\d+)\.(\d+)(pre)'
     - regex: '(Navigator)/(\d+)\.(\d+)\.(\d+)'

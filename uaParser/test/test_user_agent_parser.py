@@ -28,9 +28,25 @@ CHROME_UA_STRING = (
 
 TEST_STRINGS = (
     # ((family, major_version, minor_version, beta_version), user_agent_string)
+    #(('', '', '', '').
+    #  '', {}),
+    (('RockMelt', '0', '8', '34'),
+      'Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US) AppleWebKit/534.3 '
+      '(KHTML, like Gecko) RockMelt/0.8.34.841 Chrome/6.0.472.63 '
+      'Safari/534.3,gzip(gfe),gzip(gfe)', {}),
+    (('Firefox Beta', '4', '0', 'b4'),
+      'Mozilla/5.0 (X11; Linux i686 (x86_64); rv:2.0b4) Gecko/20100818 '
+      'Firefox/4.0b4', {}),
+    (('Firefox', '3', '6', '12'),
+      'Mozilla/5.0 (X11; U; Linux x86_64; en-US; rv:1.9.2.12) '
+      'Gecko/20101027 Ubuntu/10.04 (lucid) Firefox/3.6.12', {}),
     (('Firefox (Shiretoko)', '3', '5', '1pre'),
      'Mozilla/5.0 (X11; U; Linux i686; en-US; rv:1.9.1.1pre) '
      'Gecko/20090717 Ubuntu/9.04 (jaunty) Shiretoko/3.5.1pre', {}),
+    (('Firefox Beta', '4', '0', 'b8pre'),
+      'Mozilla/5.0 (X11; Linux x86_64; rv:2.0b8pre) Gecko/20101031 '
+      'Firefox-4.0/4.0b8pre', {}),
+
     (('Konqueror', '4', '3', '1'),
      'Mozilla/5.0 (X11; U; Linux; de-DE) AppleWebKit/527  '
      '(KHTML, like Gecko, Safari/419.3) konqueror/4.3.1,gzip(gfe)', {}),
