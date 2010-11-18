@@ -21,18 +21,18 @@ import re
 import yaml
 
 class UserAgentParser(object):
-    def __init__(self, pattern, family_replacement=None, major_version_replacement=None):
+    def __init__(self, pattern, family_replacement=None, v1_replacement=None):
         """Initialize UserAgentParser.
 
         Args:
             pattern: a regular expression string
             family_replacement: a string to override the matched family (optional)
-            major_version_replacement: a string to override the matched major_version (optional)
+            v1_replacement: a string to override the matched v1 (optional)
         """
         self.pattern = pattern
         self.user_agent_re = re.compile(self.pattern)
         self.family_replacement = family_replacement
-        self.major_version_replacement = major_version_replacement
+        self.v1_replacement = v1_replacement
 
     def MatchSpans(self, user_agent_string):
         match_spans = []
@@ -43,7 +43,7 @@ class UserAgentParser(object):
         return match_spans
 
     def Parse(self, user_agent_string):
-        family, major_version, minor_version, beta_version = None, None, None, None
+        family, v1, v2, v3 = None, None, None, None
         match = self.user_agent_re.search(user_agent_string)
         if match:
             if self.family_replacement:
@@ -54,22 +54,22 @@ class UserAgentParser(object):
             else:
                 family = match.group(1)
 
-            if self.major_version_replacement:
-                major_version = self.major_version_replacement
+            if self.v1_replacement:
+                v1 = self.v1_replacement
             elif match.lastindex >= 2:
-                major_version = match.group(2)
+                v1 = match.group(2)
             if match.lastindex >= 3:
-                minor_version = match.group(3)
+                v2 = match.group(3)
                 if match.lastindex >= 4:
-                    beta_version = match.group(4)
-        return family, major_version, minor_version, beta_version
+                    v3 = match.group(4)
+        return family, v1, v2, v3
 
 
 def Parse(user_agent_string, js_user_agent_string=None,
                     js_user_agent_family=None,
-                    js_user_agent_major_version=None,
-                    js_user_agent_minor_version=None,
-                    js_user_agent_beta_version=None):
+                    js_user_agent_v1=None,
+                    js_user_agent_v2=None,
+                    js_user_agent_v3=None):
     """Parses the user-agent string and returns the bits.
 
     Args:
@@ -78,45 +78,45 @@ def Parse(user_agent_string, js_user_agent_string=None,
         js_user_agent_family: This is an override for the family name to deal
                 with the fact that IE platform preview (for instance) cannot be
                 distinguished by user_agent_string, but only in javascript.
-        js_user_agent_major_version: major_version override - see above.
-        js_user_agent_minor_version: major_version override - see above.
-        js_user_agent_beta_version: major_version override - see above.
+        js_user_agent_v1: v1 override - see above.
+        js_user_agent_v2: v1 override - see above.
+        js_user_agent_v3: v1 override - see above.
     Returns:
-        [family, major_version, minor_version, beta_version]
+        [family, v1, v2, v3]
         e.g. ['Chrome', '4', '0', '203']
     """
 
     # Override via JS properties.
     if js_user_agent_family is not None and js_user_agent_family != '':
         family = js_user_agent_family
-        major_version = None
-        minor_version = None
-        beta_version = None
-        if js_user_agent_major_version is not None:
-            major_version = js_user_agent_major_version
-        if js_user_agent_minor_version is not None:
-            minor_version = js_user_agent_minor_version
-        if js_user_agent_beta_version is not None:
-            beta_version = js_user_agent_beta_version
+        v1 = None
+        v2 = None
+        v3 = None
+        if js_user_agent_v1 is not None:
+            v1 = js_user_agent_v1
+        if js_user_agent_v2 is not None:
+            v2 = js_user_agent_v2
+        if js_user_agent_v3 is not None:
+            v3 = js_user_agent_v3
     else:
         for parser in USER_AGENT_PARSERS:
-            family, major_version, minor_version, beta_version = parser.Parse(user_agent_string)
+            family, v1, v2, v3 = parser.Parse(user_agent_string)
             if family:
                 break
 
     # Override for Chrome Frame IFF Chrome is enabled.
     if (js_user_agent_string and js_user_agent_string.find('Chrome/') > -1 and
             user_agent_string.find('chromeframe') > -1):
-        family = 'Chrome Frame (%s %s)' % (family, major_version)
-        cf_family, major_version, minor_version, beta_version = Parse(js_user_agent_string)
+        family = 'Chrome Frame (%s %s)' % (family, v1)
+        cf_family, v1, v2, v3 = Parse(js_user_agent_string)
 
-    return family or 'Other', major_version, minor_version, beta_version
+    return family or 'Other', v1, v2, v3
 
 def GetFilters(user_agent_string, js_user_agent_string=None,
                              js_user_agent_family=None,
-                             js_user_agent_major_version=None,
-                             js_user_agent_minor_version=None,
-                             js_user_agent_beta_version=None):
+                             js_user_agent_v1=None,
+                             js_user_agent_v2=None,
+                             js_user_agent_v3=None):
     """Return the optional arguments that should be saved and used to query.
 
     js_user_agent_string is always returned if it is present. We really only need
@@ -136,9 +136,9 @@ def GetFilters(user_agent_string, js_user_agent_string=None,
         js_user_agent_family: This is an override for the family name to deal
                 with the fact that IE platform preview (for instance) cannot be
                 distinguished by user_agent_string, but only in javascript.
-        js_user_agent_major_version: major_version override - see above.
-        js_user_agent_minor_version: major_version override - see above.
-        js_user_agent_beta_version: major_version override - see above.
+        js_user_agent_v1: v1 override - see above.
+        js_user_agent_v2: v1 override - see above.
+        js_user_agent_v3: v1 override - see above.
     Returns:
         {js_user_agent_string: '[...]', js_family_name: '[...]', etc...}
     """
@@ -146,9 +146,9 @@ def GetFilters(user_agent_string, js_user_agent_string=None,
     filterdict = {
         'js_user_agent_string': js_user_agent_string,
         'js_user_agent_family': js_user_agent_family,
-        'js_user_agent_major_version': js_user_agent_major_version,
-        'js_user_agent_minor_version': js_user_agent_minor_version,
-        'js_user_agent_beta_version': js_user_agent_beta_version
+        'js_user_agent_v1': js_user_agent_v1,
+        'js_user_agent_v2': js_user_agent_v2,
+        'js_user_agent_v3': js_user_agent_v3
     }
     for key, value in filterdict.items():
         if value is not None and value != '':
@@ -170,8 +170,8 @@ for parser in yaml['user_agent_parsers']:
     if 'family_replacement' in parser:
         family_replacement = parser['family_replacement']
 
-    major_version_replacement = None
-    if 'major_version_replacement' in parser:
-        major_version_replacement = parser['major_version_replacement']
+    v1_replacement = None
+    if 'v1_replacement' in parser:
+        v1_replacement = parser['v1_replacement']
 
-    USER_AGENT_PARSERS.append(UserAgentParser(regex, family_replacement, major_version_replacement))
+    USER_AGENT_PARSERS.append(UserAgentParser(regex, family_replacement, v1_replacement))
